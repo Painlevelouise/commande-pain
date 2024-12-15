@@ -55,14 +55,13 @@
         }
 
         .add-item {
-            background-color: #007bff; /* Bleu pour "Ajouter cet article" */
+            background-color: #007bff;
             color: white;
             font-size: 16px;
             padding: 10px 20px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            transition: all 0.3s ease;
         }
 
         .add-item:hover {
@@ -70,7 +69,7 @@
         }
 
         .valider-commande {
-            background-color: #4caf50; /* Vert vif */
+            background-color: #4caf50;
             color: white;
             font-size: 18px;
             font-weight: bold;
@@ -78,15 +77,10 @@
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            display: inline-block;
-            text-transform: uppercase;
         }
 
         .valider-commande:hover {
-            background-color: #45a049; /* Vert plus foncé */
-            transform: scale(1.05);
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+            background-color: #45a049;
         }
 
         table {
@@ -114,19 +108,6 @@
             font-size: 18px;
             font-weight: bold;
         }
-
-        #recapitulatif, #pains-a-produire {
-            margin-top: 30px;
-            display: block;
-        }
-
-        #recapitulatif table, #pains-a-produire table {
-            margin-top: 20px;
-        }
-
-        #recapitulatif h2, #pains-a-produire h2 {
-            margin-bottom: 10px;
-        }
     </style>
 </head>
 <body>
@@ -145,7 +126,6 @@
                 <label for="prenom">Prénom :</label>
                 <input type="text" id="prenom" name="prenom" placeholder="Votre prénom" required>
             </div>
-
             <div class="form-group">
                 <label for="pain">Choisissez un type de pain :</label>
                 <select id="pain" name="pain">
@@ -160,7 +140,6 @@
                     <option value="Pain de Sarrasin" data-prix="10">Pain de Sarrasin - 10€/Kg</option>
                 </select>
             </div>
-
             <div class="form-group">
                 <label for="poids">Choisissez un poids :</label>
                 <select id="poids" name="poids">
@@ -169,116 +148,56 @@
                     <option value="1">1kg</option>
                 </select>
             </div>
-
             <div class="form-group">
                 <label for="quantite">Quantité :</label>
                 <input type="number" id="quantite" name="quantite" min="1" value="1">
             </div>
-
             <button type="button" class="add-item" onclick="ajouterCommande()">Ajouter cet article</button>
-
-            <table id="tableau-commandes">
-                <thead>
-                    <tr>
-                        <th>Pain</th>
-                        <th>Poids</th>
-                        <th>Quantité</th>
-                        <th>Prix</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Les commandes ajoutées apparaîtront ici -->
-                </tbody>
-            </table>
-
-            <div class="prix-total">
-                Total : <span id="prix-total">0.00</span> €
-            </div>
-
-            <div style="text-align: center; margin-top: 20px;">
-                <button type="button" class="valider-commande" onclick="validerCommande()">Valider la commande totale</button>
-            </div>
         </form>
 
-        <section id="recapitulatif">
-            <h2>Récapitulatif des commandes</h2>
-            <table id="tableau-recapitulatif">
-                <thead>
-                    <tr>
-                        <th>Client</th>
-                        <th>Commande</th>
-                        <th>Total Commande</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Détails des clients avec leur total de commande -->
-                </tbody>
-            </table>
-        </section>
+        <table id="tableau-commandes">
+            <thead>
+                <tr>
+                    <th>Pain</th>
+                    <th>Poids</th>
+                    <th>Quantité</th>
+                    <th>Prix</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Les articles commandés s'afficheront ici -->
+            </tbody>
+        </table>
 
-        <section id="pains-a-produire">
-            <h2>Tableau des pains à produire</h2>
-            <table id="tableau-pains">
-                <thead>
-                    <tr>
-                        <th>Pain</th>
-                        <th>Poids</th>
-                        <th>Quantité Totale à Produire</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Regroupement des pains à produire -->
-                </tbody>
-            </table>
-        </section>
+        <div class="prix-total">
+            Total : <span id="prix-total">0.00</span> €
+        </div>
+
+        <button class="valider-commande" onclick="validerCommande()">Valider la commande totale</button>
     </main>
 
     <script>
         let commandes = [];
-        let clients = {};
-        let painsAProduire = {};
 
-        function ajouterCommande() {
+        async function ajouterCommande() {
             const painElement = document.getElementById('pain');
             const pain = painElement.value;
             const prixParKg = parseFloat(painElement.options[painElement.selectedIndex].getAttribute('data-prix'));
             const poids = parseFloat(document.getElementById('poids').value);
             const quantite = parseInt(document.getElementById('quantite').value);
-            const nom = document.getElementById('nom').value;
-            const prenom = document.getElementById('prenom').value;
 
-            if (!pain || !poids || !quantite || !nom || !prenom) {
+            if (!pain || !poids || !quantite) {
                 alert('Veuillez remplir tous les champs.');
                 return;
             }
 
             const prix = prixParKg * poids * quantite;
-
-            // Ajout ou mise à jour de la commande du client
-            const clientKey = `${nom} ${prenom}`;
-            if (!clients[clientKey]) {
-                clients[clientKey] = { nom, prenom, commandes: [], total: 0 };
-            }
-            clients[clientKey].commandes.push({ pain, poids, quantite, prix });
-            clients[clientKey].total += prix;
-
-            // Ajout à la liste des commandes
-            commandes.push({ nom, prenom, pain, poids, quantite, prix });
-
-            // Mise à jour des pains à produire
-            const painPoidsKey = `${pain} ${poids}`;
-            if (!painsAProduire[painPoidsKey]) {
-                painsAProduire[painPoidsKey] = { pain, poids, quantite: 0 };
-            }
-            painsAProduire[painPoidsKey].quantite += quantite;
-
-            afficherTableau();
-            afficherPainsAProduire();
-            calculerPrixTotal();
+            commandes.push({ pain, poids, quantite, prix });
+            afficherCommandes();
         }
 
-        function afficherTableau() {
+        function afficherCommandes() {
             const tableau = document.getElementById('tableau-commandes').querySelector('tbody');
             tableau.innerHTML = '';
 
@@ -289,73 +208,57 @@
                     <td>${commande.poids} kg</td>
                     <td>${commande.quantite}</td>
                     <td>${commande.prix.toFixed(2)} €</td>
-                    <td><button class="tableau-btn" onclick="supprimerCommande(${index})">Supprimer</button></td>
+                    <td><button onclick="supprimerCommande(${index})">Supprimer</button></td>
                 `;
                 tableau.appendChild(row);
             });
+
+            calculerPrixTotal();
         }
 
-        function afficherPainsAProduire() {
-            const tableau = document.getElementById('tableau-pains').querySelector('tbody');
-            tableau.innerHTML = '';
-
-            for (const painKey in painsAProduire) {
-                const pain = painsAProduire[painKey];
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${pain.pain}</td>
-                    <td>${pain.poids} kg</td>
-                    <td>${pain.quantite}</td>
-                `;
-                tableau.appendChild(row);
-            }
+        function supprimerCommande(index) {
+            commandes.splice(index, 1);
+            afficherCommandes();
         }
 
         function calculerPrixTotal() {
             const total = commandes.reduce((sum, commande) => sum + commande.prix, 0);
-            document.getElementById('prix-total').innerText = total.toFixed(2);
+            document.getElementById('prix-total').textContent = total.toFixed(2);
         }
 
-        function validerCommande() {
+        async function validerCommande() {
             if (commandes.length === 0) {
                 alert('Aucune commande à valider.');
                 return;
             }
 
-            genererRecapitulatif();
-            alert('Commande validée avec succès !');
-            resetFormulaire();  // Réinitialisation du formulaire et du tableau des articles
-        }
+            const nom = document.getElementById('nom').value;
+            const prenom = document.getElementById('prenom').value;
 
-        function genererRecapitulatif() {
-            const tableauRecap = document.getElementById('tableau-recapitulatif').querySelector('tbody');
-            tableauRecap.innerHTML = '';
-
-            // Récapitulatif des commandes par client
-            for (const clientKey in clients) {
-                const client = clients[clientKey];
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${client.nom} ${client.prenom}</td>
-                    <td>
-                        <ul>
-                            ${client.commandes.map(commande => 
-                                `<li>${commande.pain} (${commande.poids}kg) - ${commande.quantite} x ${commande.prix.toFixed(2)} €</li>`
-                            ).join('')}
-                        </ul>
-                    </td>
-                    <td>${client.total.toFixed(2)} €</td>
-                `;
-                tableauRecap.appendChild(row);
+            if (!nom || !prenom) {
+                alert('Veuillez saisir votre nom et prénom.');
+                return;
             }
-        }
 
-        function resetFormulaire() {
-            // Réinitialisation du formulaire et du tableau des articles
-            document.getElementById('formulaire-commande').reset();
-            commandes = [];
-            afficherTableau();  // Vider le tableau des commandes
-            calculerPrixTotal();  // Remettre le total à 0
+            try {
+                const response = await fetch('https://script.google.com/macros/s/AKfycbwQWxGaNn1N-aaFO3apblo0S4hbR5Z1YANZ46oRw9K2fphgS7EtICuOUzEZmX9vTboHvw/exec', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nom, prenom, commandes }),
+                });
+
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    alert('Commande validée et enregistrée avec succès !');
+                    commandes = [];
+                    afficherCommandes();
+                } else {
+                    alert(`Erreur : ${result.message}`);
+                }
+            } catch (error) {
+                alert(`Erreur : ${error.message}`);
+            }
         }
     </script>
 </body>
